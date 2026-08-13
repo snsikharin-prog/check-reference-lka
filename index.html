@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ระบบตรวจสอบเลขที่เกียรติบัตร</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+Thai:wght@500;600;700&family=Noto+Sans+Thai:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy-deep: #12213d;
+    --navy: #1c3560;
+    --gold: #b8923f;
+    --gold-light: #e7d4a3;
+    --cream: #f7f4ec;
+    --ink: #1f2430;
+    --line: #dcd4bf;
+    --ok: #2f6b45;
+    --err: #8a2c2c;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    font-family: 'Noto Sans Thai', sans-serif;
+    background: var(--cream);
+    color: var(--ink);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  /* เส้นขอบลายเกียรติบัตรบาง ๆ ด้านบน */
+  .ribbon {
+    width: 100%;
+    height: 6px;
+    background: linear-gradient(90deg, var(--navy) 0%, var(--gold) 50%, var(--navy) 100%);
+  }
+
+  header {
+    width: 100%;
+    background: var(--navy-deep);
+    color: var(--cream);
+    padding: 40px 20px 34px;
+    text-align: center;
+    position: relative;
+  }
+
+  header .seal {
+    width: 46px;
+    height: 46px;
+    margin: 0 auto 14px;
+    border: 2px solid var(--gold-light);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Noto Serif Thai', serif;
+    font-weight: 700;
+    font-size: 18px;
+    color: var(--gold-light);
+  }
+
+  header h1 {
+    font-family: 'Noto Serif Thai', serif;
+    font-weight: 700;
+    font-size: clamp(22px, 4vw, 30px);
+    margin: 0 0 8px;
+    letter-spacing: 0.02em;
+  }
+
+  header p {
+    margin: 0;
+    color: var(--gold-light);
+    font-size: 14px;
+    letter-spacing: 0.04em;
+  }
+
+  main {
+    width: 100%;
+    max-width: 560px;
+    padding: 40px 20px 60px;
+    flex: 1;
+  }
+
+  .card {
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    padding: 32px 28px;
+    box-shadow: 0 1px 3px rgba(18, 33, 61, 0.06);
+  }
+
+  label {
+    display: block;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--navy);
+    margin-bottom: 8px;
+  }
+
+  .input-row {
+    display: flex;
+    gap: 10px;
+  }
+
+  input[type="text"] {
+    flex: 1;
+    min-width: 0;
+    padding: 13px 14px;
+    font-size: 16px;
+    font-family: 'Noto Sans Thai', sans-serif;
+    border: 1.5px solid var(--line);
+    border-radius: 3px;
+    background: var(--cream);
+    color: var(--ink);
+    outline: none;
+    transition: border-color 0.15s;
+  }
+
+  input[type="text"]:focus {
+    border-color: var(--navy);
+  }
+
+  button {
+    padding: 13px 22px;
+    font-size: 15px;
+    font-weight: 600;
+    font-family: 'Noto Sans Thai', sans-serif;
+    background: var(--navy);
+    color: #fff;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+    transition: background 0.15s;
+    white-space: nowrap;
+  }
+
+  button:hover { background: var(--navy-deep); }
+  button:disabled { background: #9aa4b5; cursor: not-allowed; }
+
+  .hint {
+    margin-top: 10px;
+    font-size: 12.5px;
+    color: #6b7280;
+  }
+
+  .result {
+    margin-top: 26px;
+    border-top: 1px dashed var(--line);
+    padding-top: 22px;
+    display: none;
+  }
+
+  .result.show { display: block; }
+
+  .status-line {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 700;
+    font-size: 15px;
+    margin-bottom: 16px;
+  }
+
+  .status-line.found { color: var(--ok); }
+  .status-line.not-found { color: var(--err); }
+  .status-line.error { color: var(--err); }
+
+  .dot {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: currentColor;
+    flex-shrink: 0;
+  }
+
+  .field {
+    margin-bottom: 12px;
+  }
+
+  .field .k {
+    font-size: 12.5px;
+    color: #6b7280;
+    margin-bottom: 3px;
+  }
+
+  .field .v {
+    font-size: 16px;
+    color: var(--ink);
+    font-weight: 500;
+  }
+
+  .field.real .v {
+    font-family: 'Noto Serif Thai', serif;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--navy-deep);
+    letter-spacing: 0.02em;
+  }
+
+  footer {
+    padding: 20px;
+    font-size: 12px;
+    color: #8a8f9c;
+    text-align: center;
+  }
+
+  @media (max-width: 400px) {
+    .input-row { flex-direction: column; }
+  }
+</style>
+</head>
+<body>
+
+  <div class="ribbon"></div>
+
+  <header>
+    <div class="seal">LKA</div>
+    <h1>ระบบตรวจสอบเลขที่เกียรติบัตร</h1>
+    <p>กิจกรรมสัปดาห์วิทยาศาสตร์ โรงเรียนหลวงพ่อปานคลองด่านอนุสรณ์</p>
+  </header>
+
+  <main>
+    <div class="card">
+      <label for="codeInput">Ref. No:</label>
+      <div class="input-row">
+        <input type="text" id="codeInput" placeholder="เช่น CERT-SC-XXX" autocomplete="off">
+        <button id="searchBtn">ตรวจสอบ</button>
+      </div>
+      <div class="hint">ระบบจะค้นหาและแสดงเลขที่จริงในฐานข้อมูล หากพบข้อมูลตรงกัน</div>
+
+      <div class="result" id="resultBox"></div>
+    </div>
+  </main>
+
+  <footer>ข้อมูลอ้างอิงจากฐานข้อมูลกลางของโรงเรียนหลวงพ่อปานคลองด่านอนุสรณ์</footer>
+
+  <script>
+    // TODO: แก้เป็น URL ของ Apps Script Web App ที่ deploy ไว้
+    const API_URL = 'https://script.google.com/macros/s/AKfycbyuc9_ZS6i1myw5HqgSHc_Wd6g3QCVJmX3ExBeSpozL_l4lKWFA2LNBS-2gHaYpehiC/exec';
+
+    const input = document.getElementById('codeInput');
+    const btn = document.getElementById('searchBtn');
+    const resultBox = document.getElementById('resultBox');
+
+    async function search() {
+      const code = input.value.trim();
+      if (!code) {
+        input.focus();
+        return;
+      }
+
+      btn.disabled = true;
+      btn.textContent = 'กำลังตรวจสอบ...';
+      resultBox.className = 'result';
+      resultBox.innerHTML = '';
+
+      try {
+        const res = await fetch(`${API_URL}?code=${encodeURIComponent(code)}`);
+        const data = await res.json();
+        render(data);
+      } catch (err) {
+        render({ status: 'error', message: 'ไม่สามารถเชื่อมต่อระบบได้ กรุณาลองใหม่อีกครั้ง' });
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'ตรวจสอบ';
+      }
+    }
+
+    function render(data) {
+      resultBox.classList.add('show');
+
+      if (data.status === 'found') {
+        resultBox.innerHTML = `
+          <div class="status-line found"><span class="dot"></span>พบข้อมูลในระบบ</div>
+          <div class="field real">
+            <div class="k">เลขที่จริง</div>
+            <div class="v">${escapeHtml(data.realNumber || '-')}</div>
+          </div>
+          ${data.name ? `<div class="field"><div class="k">ชื่อ-นามสกุล</div><div class="v">${escapeHtml(data.name)}</div></div>` : ''}
+          ${data.course ? `<div class="field"><div class="k">หลักสูตร/กิจกรรม</div><div class="v">${escapeHtml(data.course)}</div></div>` : ''}
+        `;
+      } else if (data.status === 'not_found') {
+        resultBox.innerHTML = `
+          <div class="status-line not-found"><span class="dot"></span>ไม่พบข้อมูล</div>
+          <div class="field"><div class="v">ไม่พบเลขที่นี้ในฐานข้อมูล กรุณาตรวจสอบเลขที่อีกครั้ง</div></div>
+        `;
+      } else {
+        resultBox.innerHTML = `
+          <div class="status-line error"><span class="dot"></span>เกิดข้อผิดพลาด</div>
+          <div class="field"><div class="v">${escapeHtml(data.message || 'ไม่สามารถตรวจสอบได้ในขณะนี้')}</div></div>
+        `;
+      }
+    }
+
+    function escapeHtml(str) {
+      const div = document.createElement('div');
+      div.textContent = str;
+      return div.innerHTML;
+    }
+
+    btn.addEventListener('click', search);
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') search();
+    });
+  </script>
+
+</body>
+</html>
